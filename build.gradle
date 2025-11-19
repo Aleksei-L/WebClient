@@ -1,0 +1,51 @@
+plugins {
+    id "java"
+    id "com.google.protobuf" version "0.9.5"
+}
+
+group = "org.web.client"
+version = "1.0"
+
+repositories {
+    mavenCentral()
+}
+
+def grpcVersion = "1.63.0"
+def protobufVersion = "3.25.3"
+
+dependencies {
+    implementation "org.jetbrains:annotations:23.0.0"
+
+    implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+
+    compileOnly "org.apache.tomcat:annotations-api:6.0.53"
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${protobufVersion}"
+    }
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
+        }
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.plugins {
+                grpc {}
+            }
+        }
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs "build/generated/sources/proto/main/java"
+            srcDirs "build/generated/sources/proto/main/grpc"
+        }
+    }
+}
